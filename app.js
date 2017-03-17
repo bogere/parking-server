@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var cors=require('cors');
+//var cors=require('cors');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var Tasks=require('./routes/Tasks');
@@ -15,7 +15,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(cors());
+//app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: false }));
@@ -26,6 +26,15 @@ app.use(express.static(path.join(__dirname, 'public'))); //built-in middleware..
 
 /*app.use('/resources',express.static(__dirname + '/images'));
 So now, you can use http://localhost:5000/resources/myImage.jpg to serve all the images instead of http://localhost:5000/images/myImage.jpg. */
+
+ //how to avoid using CORS middleware..
+ //CORS on ExpressJS
+ app.use(function(req,res, next){
+    res.header('Access-Control-Allow-Origin', '*'); //for all routes.
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next()
+ })
+
 app.use('/', routes);
 app.use('/users', users);
 app.use('/Tasks',Tasks);
