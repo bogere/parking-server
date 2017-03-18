@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 //var errorHandler = require('errorhandler');//Error: Cannot find module 'errorhandler'
 
 //load the routes... divide ur server business logic.. authenicate n register
+//Then, load the router module in the app:
 //var auth = require('./routes/authenicate');
 var parkingSlots = require('./routes/parking');
 var Login = require('./routes/login');//change it to auth later.
@@ -46,8 +47,9 @@ app.get('/', function(req,res, next){
 //app.use('/', router);  //ReferenceError: router is not defined
 //app.use('/login', login);
 //app.use('/login', Login);
-app.use('/', parkingSlots);
-app.use('/login', Login);
+//app.use('/', parkingSlots); //instead of this... / homepage
+app.use('/parking', parkingSlots); //about the parking part. Acess sign upp like parking/signups wat abt /api/signup
+//app.use('/login', Login);
 
 //// error handling middleware should be loaded after the loading the routes
 //Error handling
