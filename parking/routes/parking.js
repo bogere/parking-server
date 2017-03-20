@@ -35,9 +35,11 @@ router.get('/', function(req,res,next){
           console.log(err);
        } else {
         //  res.json(rows); //what about JSON.Stringify()...
-          console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
+            console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
          //res.end(JSON.stringify(rows)); //no data retrieved.
           //res.send(JSON.stringify(rows));
+           //res.setHeader('Content-Type', 'application/json'); //Error: Can't set headers after they are sent.
+           //res.end(rows);
        }
     });
     connection.end(); //Closing the connection ...ensures all remaining queries r
@@ -55,16 +57,18 @@ router.get('/signup', function(req,res,next){ //if lacks req,res parameters.. th
 //for registering..
 router.post('/register', function(req,res,next){
      //capture the values posted... VehicleNo n PIN or password. from the form.
-         var vehicleNo =   req.body.vehicleNo,
-                //  pass =   req.body.password;
+         //var vehicleNo =   req.body.vehicleNo,
+         const  vehicleNo = req.body.vehicleNo,
+                  //pass =   req.body.password;
                 //pass = md5(req.body.password); //hash the password...not efficient..
-                pass = req.body.password;
-
+                pass = req.body.password;//undefined  coz u have not required the bodyParser.
+         console.log(pass);
         //insert the values into the database..... register the user/car. neatly escaping queries... SQL injection.
           var carDetails = {vehicleNo: vehicleNo, vehiclePass: pass}; //caters for table columsn n its values.
          //var carDetails = {vehicle: vehicleNo, vehiclePass: md5(pass)};
+          console.log(carDetails);
 
-         connection.query('INSERT INTO vehicle SET ?', carDetails,  function(err,rows){
+        /* connection.query('INSERT INTO vehicle SET ?', carDetails,  function(err,rows){
                             //? ==> escaping queries.. stop SQL injection.
                 if (err) {
                     console.log(err);
@@ -72,7 +76,7 @@ router.post('/register', function(req,res,next){
                     console.log('Successfully registered', JSON.stringify(rows)); //difference btn rows n results.
                 }
 
-         });
+         });*/
 
 
  next()

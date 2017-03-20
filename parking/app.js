@@ -8,12 +8,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var router = express.Router();
 //var errorHandler = require('errorhandler');//Error: Cannot find module 'errorhandler'
 
 //load the routes... divide ur server business logic.. authenicate n register
 //Then, load the router module in the app:
 //var auth = require('./routes/authenicate');
-var parkingSlots = require('./routes/parking');
+//var parkingSlots = require('./routes/parking');
+var parkingSlots = require('./routes/parking')(router);
 var Login = require('./routes/login');//change it to auth later.
 //var multer = require('multer'); //deals with file uploads.. like images
 var app = express(); //create express object.
@@ -25,7 +27,8 @@ app.use(logger('dev')); //get logs during development..
 //Parse incoming request bodies in a middleware before your handlers, availabe
 //under the `req.body` property.
 app.use(bodyParser.json({limit: '100mb'})); //Returns middleware that only parses `json`.
-app.use(bodyParser.urlencoded({limit:'100mb', extended: false})); //increase in case of problem
+//app.use(bodyParser.urlencoded({limit:'100mb', extended: false})); //increase in case of problem
+app.use(bodyParser.urlencoded({extended: true}));
 //app.use(multer()); //middleware to handle file uploads.
 //app.use(express.static(path.join(__dirname , 'public' ))); //serving static files...html n css in public folder.
 //allow CORS... origin stuff.
