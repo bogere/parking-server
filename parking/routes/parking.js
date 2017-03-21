@@ -22,7 +22,8 @@ connection.connect(function(err){
    console.log('Connected as id', connection.threadId);
 }); //make connection.  export it as module..dbconnection.
 
-router.get('/', function(req,res,next){
+//router.get('/', function(req,res,next){
+router.get('/', function(req,res){
     res.send('Accessing the Parking home page');
   //setting the header in JSOn format.
      //res.setHeader('Content-Type', 'application/*+json'); //Error: Can't set headers after they are sent.
@@ -34,8 +35,8 @@ router.get('/', function(req,res,next){
            //res.json(err); //Error: Can't set headers after they are sent.
           console.log(err);
        } else {
-        //  res.json(rows); //what about JSON.Stringify()...
-            console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
+          //res.json(rows); //what about JSON.Stringify()...
+             console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
          //res.end(JSON.stringify(rows)); //no data retrieved.
           //res.send(JSON.stringify(rows));
            //res.setHeader('Content-Type', 'application/json'); //Error: Can't set headers after they are sent.
@@ -45,17 +46,19 @@ router.get('/', function(req,res,next){
     connection.end(); //Closing the connection ...ensures all remaining queries r
                     //executed  b4 sending quit packet to  SQL server. terminate  connection gracefully
 
-    next()
+    //next()... causes teh app to move to another middleware without finsihing its job. router.use()
 });
 
-router.get('/signup', function(req,res,next){ //if lacks req,res parameters.. the browser redirects continously
+//router.get('/signup', function(req,res,next){ //if lacks req,res parameters.. the browser redirects continously
+ router.get('/signup', function(req,res){
    res.send('Registering in progress');
   console.log('Iam registering one of the drivers')
-  next();
+   //next();
 });
 
 //for registering..
-router.post('/register', function(req,res,next){
+//router.post('/register', function(req,res,next){
+ router.post('/register', function(req,res){
      //capture the values posted... VehicleNo n PIN or password. from the form.
          //var vehicleNo =   req.body.vehicleNo,
          const  vehicleNo = req.body.vehicleNo,
@@ -64,8 +67,8 @@ router.post('/register', function(req,res,next){
                 pass = req.body.password;//undefined  coz u have not required the bodyParser.
          console.log(pass);
         //insert the values into the database..... register the user/car. neatly escaping queries... SQL injection.
-          var carDetails = {vehicleNo: vehicleNo, vehiclePass: pass}; //caters for table columsn n its values.
-         //var carDetails = {vehicle: vehicleNo, vehiclePass: md5(pass)};
+            //var carDetails = {vehicleNo: vehicleNo, vehiclePass: pass}; //caters for table columsn n its values.
+            var carDetails = {vehicle: vehicleNo, vehiclePass: md5(pass)};
           console.log(carDetails);
 
         /* connection.query('INSERT INTO vehicle SET ?', carDetails,  function(err,rows){
@@ -79,7 +82,7 @@ router.post('/register', function(req,res,next){
          });*/
 
 
- next()
+ //next()
 })
 
 module.exports = router; // this makes all the routes(/ or /register) defined  available in object.

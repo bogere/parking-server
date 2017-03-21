@@ -12,6 +12,7 @@ router.post('/', function(req,res,next){
       pass = req.body.password;
       console.log('Username:', user );
       console.log('Password:', pass);
+      next()
 })
 
 module.exports = router;
