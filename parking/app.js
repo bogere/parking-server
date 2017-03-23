@@ -2,6 +2,7 @@
 //Building the parking Mgt server....
 
 //Loading dependencies
+var http = require('http');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -98,7 +99,12 @@ app.use(function(err, req, res, next) {
   });
 });
 */
-
+//set the content type.. to json..first. cant set header after they r sent.
+ //http.createServer()
+ /*var app  = http.createServer(function(req,res){
+     res.setHeader('Content-Type', 'application/json');
+     res.send(JSON.stringify({a: 1}))
+ })*/
 //start the server.. pliz..
 app.listen(app.get('port'), function(){
   console.log('Parking Mgt Server is running on port ', app.get('port'));

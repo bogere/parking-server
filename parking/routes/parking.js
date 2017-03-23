@@ -24,16 +24,23 @@ connection.connect(function(err){
 
 //router.get('/', function(req,res,next){
 router.get('/', function(req,res){
-    res.send('Accessing the Parking home page');
+    //res.send('Accessing the Parking home page');
   //setting the header in JSOn format.
      //res.setHeader('Content-Type', 'application/*+json'); //Error: Can't set headers after they are sent.
+     res.writeHead(200,{
+        'Content-Type': 'x-application/json'
+     });
     //interact with the db... return the parking data.
     //var sql = "SELECT * FROM 'task'"; //Error: ER_PARSE_ERROR: You have an error in your SQL syntax;
     var sql = "SELECT * FROM task";
     connection.query(sql, function(err,rows){
-       if (err) {
+          //catering for the json formated data.
+
+
+        if (err) {
            //res.json(err); //Error: Can't set headers after they are sent.
-          console.log(err);
+          //console.log(err);
+
        } else {
           //res.json(rows); //what about JSON.Stringify()...
              console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
@@ -41,7 +48,15 @@ router.get('/', function(req,res){
           //res.send(JSON.stringify(rows));
            //res.setHeader('Content-Type', 'application/json'); //Error: Can't set headers after they are sent.
            //res.end(rows);
+           //res.json({'Error': false , 'Parking': rows});//i love better formated JSON
+           //Error: Can't set headers after they are sent. for the above problem.
+             //res.end(rows);//send the results immediately.
+           //res.send(return JSON.stringify(rows));
+       } // i hear it is returning the data twice .. thus not responding.
+      /* if (err) {
+         return res.send(err);
        }
+       res.json(rows); */
     });
     connection.end(); //Closing the connection ...ensures all remaining queries r
                     //executed  b4 sending quit packet to  SQL server. terminate  connection gracefully
@@ -65,13 +80,14 @@ router.get('/', function(req,res){
                   //pass =   req.body.password;
                 //pass = md5(req.body.password); //hash the password...not efficient..
                 pass = req.body.password;//undefined  coz u have not required the bodyParser.
-         console.log(pass);
+         //console.log(pass);
         //insert the values into the database..... register the user/car. neatly escaping queries... SQL injection.
             //var carDetails = {vehicleNo: vehicleNo, vehiclePass: pass}; //caters for table columsn n its values.
-            var carDetails = {vehicle: vehicleNo, vehiclePass: md5(pass)};
+        //var carDetails = {vehicle: vehicleNo, vehiclePass: md5(pass)}; //[Error: ER_BAD_FIELD_ERROR: Unknown column 'vehicle' in 'field list']
+        var carDetails = {vehicleNo: vehicleNo, vehiclePass: md5(pass)};
           console.log(carDetails);
 
-        /* connection.query('INSERT INTO vehicle SET ?', carDetails,  function(err,rows){
+         connection.query('INSERT INTO vehicle SET ?', carDetails,  function(err,rows){
                             //? ==> escaping queries.. stop SQL injection.
                 if (err) {
                     console.log(err);
@@ -79,7 +95,7 @@ router.get('/', function(req,res){
                     console.log('Successfully registered', JSON.stringify(rows)); //difference btn rows n results.
                 }
 
-         });*/
+         });
 
 
  //next()
