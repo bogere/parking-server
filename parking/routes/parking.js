@@ -33,7 +33,8 @@ router.get('/', function(req,res){
     //interact with the db... return the parking data.
     //var sql = "SELECT * FROM 'task'"; //Error: ER_PARSE_ERROR: You have an error in your SQL syntax;
     var sql = "SELECT * FROM task";
-    connection.query(sql, function(err,rows){
+         connection.query(sql, function(err,rows){
+        //connection.query(sql, function(err,rows, callback){
           //catering for the json formated data.
 
 
@@ -43,7 +44,7 @@ router.get('/', function(req,res){
 
        } else {
           //res.json(rows); //what about JSON.Stringify()...
-             console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
+          console.log(JSON.stringify(rows));  //converts them into JSON perfectly.
          //res.end(JSON.stringify(rows)); //no data retrieved.
           //res.send(JSON.stringify(rows));
            //res.setHeader('Content-Type', 'application/json'); //Error: Can't set headers after they are sent.
@@ -52,13 +53,15 @@ router.get('/', function(req,res){
            //Error: Can't set headers after they are sent. for the above problem.
              //res.end(rows);//send the results immediately.
            //res.send(return JSON.stringify(rows));
+           //res.json(callback(rows));
        } // i hear it is returning the data twice .. thus not responding.
       /* if (err) {
          return res.send(err);
        }
        res.json(rows); */
+      // res.send(hello);
     });
-    connection.end(); //Closing the connection ...ensures all remaining queries r
+    //connection.end(); //Closing the connection ...ensures all remaining queries r
                     //executed  b4 sending quit packet to  SQL server. terminate  connection gracefully
 
     //next()... causes teh app to move to another middleware without finsihing its job. router.use()
@@ -96,9 +99,23 @@ router.get('/', function(req,res){
                 }
 
          });
-
-
  //next()
-})
+});
+
+ function testParking(){
+     var hello = connection.query('SELECT * FROM task', function(err,results){
+           if (err) {
+              throw error
+           }
+           return;
+     })
+ }
+
+//let try to wrap the SQL transactions in a function
+router.get('/testing', function(req,res){
+      //res.json(testParking())
+      var test = testParking();
+      res.json(test);
+});
 
 module.exports = router; // this makes all the routes(/ or /register) defined  available in object.

@@ -2,6 +2,7 @@
 //For parking Mgt Server..
 //load the dependencies.
 var express = require('express');
+var rest = require('restify');
 //var path = require('path'); u r not utilising static file http..not serving html files.
 var cookieParser = require('cookie-parser'); //for cookies based.
 var bodyParser = require('body-parser'); //for the post values...
