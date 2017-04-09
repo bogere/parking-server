@@ -96,6 +96,31 @@ server.post('/login', function(req,res){
        })
   })
 })
+
+//reserve the parking area... update teh parkig_status table
+/*server.get('/reserve/:id', function(req,res,next){ //update teh parking status of _id parking area.
+     res.send(req.params.id); //can u get the Id of the parking slot clicked.
+})*/
+server.post('/reserve/:id', function(req,res,next){
+     //update the parking status of the _id of parking area clicked on...
+     //capture teh id of the parking area... n later teh username of the user...who z booking.
+     //var parkingId = req.params.id; //or teh android client should pass the id.. itself./ url... instead
+     var parkingId = req.params.parkingId;
+      var title = req.params.title;
+      var status = req.params.status;
+      pool.getConnection(function(err,connection){
+           //hey perform the sql transaction...
+           var sql = "UPDATE task SET  Title=?,Status=? WHERE id = ? ";//table values
+          //connection.query(sql,[Task.Title, Task.Status, id],function(err,rows){
+          connection.query(sql,[title, status,parkingId],function(err,rows){ //posted variables
+                if(err) throw err;
+                res.json(rows);
+          });
+      });
+
+})
+
+
 server.listen(3000, function(){
     console.log('PMS is running on port 3000');
     //console.log('%s listening at %s', server.name , server.url)
