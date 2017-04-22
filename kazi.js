@@ -34,7 +34,8 @@ var pool = mysql.createPool({ //when using pools better vesrion.
 server.get('/tasks', function(req,res,next){
   pool.getConnection(function(err, connection) {
         //connection.query('SELECT * FROM sometable WHERE id = 1', function(err, rows) {
-            connection.query('SELECT * FROM task', function(err,rows){
+            //connection.query('SELECT * FROM task', function(err,rows){ //i changed the table to hello.
+            connection.query('SELECT * FROM hello', function(err,rows){ //modification
             if (err) throw err;
             //release the connection when done with the SQL queries.
             connection.release();// i donot thik it z right place.. configure pliz.
@@ -54,13 +55,18 @@ server.post('/tasks_save', function(req,res,next){
   //catering for teh different operations such as insert|update|delete
    //var operation = req.body.webix_operation;
    var operation = req.params.webix_operation; //capture the type of operation from webix.
+   console.log(operation);
    //get teh id  of the posted values. capture teh post values.
      var id = req.params.id,
          text = req.params.text,
          details= req.params.details,
          status = req.params.status,
          personId= req.params.personId;
-
+     //test the variables picked for delete update  operation.
+     console.log(id);
+     console.log(text);
+     console.log(details);
+     
     pool.getConnection(function(err,connection){
 
         //for adding the tasks.
@@ -75,17 +81,21 @@ server.post('/tasks_save', function(req,res,next){
                      next()
                });
         } else if (operation == 'update') {
-            var sql = "UPDATE hello SET text = ?, details=?,status = ?,personId= ? WHERE id = ?";
+            //var sql = "UPDATE hello SET text = ?, details=?,status = ?,personId= ? WHERE id = ?";
+            //"ER_BAD_FIELD_ERROR: Unknown column 'id' in 'where clause'"
+            var sql = "UPDATE hello SET text=?, details=?, status=?, personId=? WHERE task_id=?";
             //upadte the details in the db.
             connection.query(sql,[text, details, status,personId, id] , function(err,results){
                      // the [values].. values retrieved from the form.
                      if(err) throw err;
-                    res.json(rows);
+                    //res.json(rows);
+                    res.json(results)
                   //  res.json({"Message": "update of tasks was successful"});
             })
 
         } else if (operation == 'delete') {
-             var sql = "DELETE FROM hello WHERE id = ?";
+             //var sql = "DELETE FROM hello WHERE id = ?";
+             var sql = "DELETE FROM hello WHERE task_id =?"; //let see the results.
              connection.query(sql, [id], function(err,rows){
                   if(err) throw err;
                   res.json(rows);
@@ -93,7 +103,7 @@ server.post('/tasks_save', function(req,res,next){
              });
 
         } else {
-
+             res.json({"Message": "Operation not supported"});
         }
 
 
