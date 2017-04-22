@@ -13,12 +13,22 @@ var server = restify.createServer({
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
+server.use(restify.CORS()); //enable CORS requests.
 
 // I hear that restify borrows alot from express.. like express for only REST..
 /*server.use(function(req,res,next){ //allow to  serve cross domain requests
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
 }) */
+//allow cross origin so that android phones can access REST API..
+server.opts(/.*/,function(req,res,next){
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", req.header("Access-Control-Request-Methods"));
+  res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers"));
+  res.send(200); //response is OK
+  return next()
+})
+
 
 
 //Empty db info on purpose
