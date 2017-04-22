@@ -73,11 +73,11 @@ server.post('/tasks_save', function(req,res,next){
         //for adding the tasks.
         if (operation== 'insert') {
               //capture all teh values.
-              //var taskDetails = {text:text, details:details, status:status, personId:personId};
-              var taskDetails = {task_id:id,text:text, details:details, status:status, personId:personId};
+               var taskDetails = {text:text, details:details, status:status, personId:personId};
+              //var taskDetails = {task_id:id,text:text, details:details, status:status, personId:personId};
                //insert the takskDetails in the database.
-               //connection.query('INSERT INTO hello SET ?', taskDetails, function(err,rows){
-               connection.query('INSERT INTO todo SET ?', taskDetails, function(err,rows){
+               connection.query('INSERT INTO hello SET ?', taskDetails, function(err,rows){
+               //connection.query('INSERT INTO todo SET ?', taskDetails, function(err,rows){
                         if (err) throw err;
                         res.json({"Message": "Task added successfully"});
 
@@ -86,8 +86,8 @@ server.post('/tasks_save', function(req,res,next){
         } else if (operation == 'update') {
             //var sql = "UPDATE hello SET text = ?, details=?,status = ?,personId= ? WHERE id = ?";
             //"ER_BAD_FIELD_ERROR: Unknown column 'id' in 'where clause'"
-            //var sql = "UPDATE hello SET text=?, details=?, status=?, personId=? WHERE task_id=?";
-            var sql = "UPDATE todo SET text=?, details=?, status=?, personId=? WHERE task_id=?";
+             var sql = "UPDATE hello SET text=?, details=?, status=?, personId=? WHERE task_id=?";
+            //var sql = "UPDATE todo SET text=?, details=?, status=?, personId=? WHERE task_id=?";
             //upadte the details in the db.
             connection.query(sql,[text, details, status,personId, id] , function(err,results){
                      // the [values].. values retrieved from the form.
