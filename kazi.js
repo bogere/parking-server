@@ -35,8 +35,8 @@ server.get('/tasks', function(req,res,next){
   pool.getConnection(function(err, connection) {
         //connection.query('SELECT * FROM sometable WHERE id = 1', function(err, rows) {
             //connection.query('SELECT * FROM task', function(err,rows){ //i changed the table to hello.
-            //connection.query('SELECT * FROM hello', function(err,rows){ //modification
-      connection.query('SELECT * FROM todo', function(err,rows){ //modification
+       connection.query('SELECT * FROM hello', function(err,rows){ //modification
+       //connection.query('SELECT * FROM todo', function(err,rows){ //modification
             if (err) throw err;
             //release the connection when done with the SQL queries.
             connection.release();// i donot thik it z right place.. configure pliz.
@@ -58,26 +58,31 @@ server.post('/tasks_save', function(req,res,next){
    var operation = req.params.webix_operation; //capture the type of operation from webix.
    console.log(operation);
    //get teh id  of the posted values. capture teh post values.
-     var id = req.params.id,
-         text = req.params.text,
+      var id = req.params.id;
+      var text = req.params.text,
          details= req.params.details,
          status = req.params.status,
          personId= req.params.personId;
+         //capture the itemId of the task.
+         //itemId = req.params.itemId;
      //test the variables picked for delete update  operation.
-     console.log(id);
+     //console.log(id);
      console.log(text);
      console.log(details);
+     //console.log(itemId);
+     console.log(personId);
 
     pool.getConnection(function(err,connection){
 
         //for adding the tasks.
         if (operation== 'insert') {
               //capture all teh values.
-               var taskDetails = {text:text, details:details, status:status, personId:personId};
-              //var taskDetails = {task_id:id,text:text, details:details, status:status, personId:personId};
+              var taskDetails = {text:text, details:details, status:status, personId:personId};
+              //var taskDetails = {itemId:itemId,text:text, details:details, status:status, personId:personId};
+              //var taskDetails = {itemId:id,text:text, details:details, status:status, personId:personId};
                //insert the takskDetails in the database.
                connection.query('INSERT INTO hello SET ?', taskDetails, function(err,rows){
-               //connection.query('INSERT INTO todo SET ?', taskDetails, function(err,rows){
+                // connection.query('INSERT INTO todo SET ?', taskDetails, function(err,rows){
                         if (err) throw err;
                         res.json({"Message": "Task added successfully"});
 
@@ -86,11 +91,16 @@ server.post('/tasks_save', function(req,res,next){
         } else if (operation == 'update') {
             //var sql = "UPDATE hello SET text = ?, details=?,status = ?,personId= ? WHERE id = ?";
             //"ER_BAD_FIELD_ERROR: Unknown column 'id' in 'where clause'"
-             var sql = "UPDATE hello SET text=?, details=?, status=?, personId=? WHERE task_id=?";
-            //var sql = "UPDATE todo SET text=?, details=?, status=?, personId=? WHERE task_id=?";
+              //var sql = "UPDATE hello SET text=?, details=?, status=?, personId=? WHERE task_id=?";
+             //var sql = "UPDATE todo SET text=?, details=?, status=?, personId=? WHERE task_id=?";
+               //var sql = "UPDATE todo SET text=?, details=?, status=?, personId=? WHERE itemId=?";
+               //try using the personId to edit/update teh details. since id is playing games
+               var sql = "UPDATE hello SET text=?,details=?,status=?,personId=? WHERE personId=?";
             //upadte the details in the db.
-            connection.query(sql,[text, details, status,personId, id] , function(err,results){
-                     // the [values].. values retrieved from the form.
+            //connection.query(sql,[text, details, status,personId, id] , function(err,results){
+            //connection.query(sql,[text, details, status,personId, itemId] , function(err,results){//with itemId
+            connection.query(sql,[text, details, status,personId,personId] , function(err,results){
+                     // the [values].. values retrieved from the form.  utiilisng the personId for editing
                      if(err) throw err;
                     //res.json(rows);
                     res.json(results)
@@ -99,9 +109,13 @@ server.post('/tasks_save', function(req,res,next){
 
         } else if (operation == 'delete') {
              //var sql = "DELETE FROM hello WHERE id = ?";
-            // var sql = "DELETE FROM hello WHERE task_id =?"; //let see the results.
-            var sql = "DELETE FROM hello WHERE task_id =?"; //changed table to todo...
-             connection.query(sql, [id], function(err,rows){
+              //var sql = "DELETE FROM hello WHERE task_id =?"; //let see the results.
+             //var sql = "DELETE FROM todo WHERE itemId =?"; //changed table to todo...
+             //delete using the personId as identifier instead of id
+             var sql = "DELETE FROM hello WHERE personId =?";
+             //connection.query(sql, [id], function(err,rows){
+             //connection.query(sql, [itemId], function(err,rows){
+             connection.query(sql, [personId], function(err,rows){
                   if(err) throw err;
                   res.json(rows);
                   //res.json({"Message": "Tasks was successfully deleted"});
@@ -111,9 +125,6 @@ server.post('/tasks_save', function(req,res,next){
              res.json({"Message": "Operation not supported"});
         }
 
-
-
-
     });
 })
 
@@ -121,3 +132,6 @@ server.post('/tasks_save', function(req,res,next){
 server.listen(3000, function(){
 	console.log('Magic kanban on port 3000')
 })
+
+//it seems the todo table z not going to work... wait for some communication from webix forum.
+//about the itemId that u added..

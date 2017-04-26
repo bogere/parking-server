@@ -13,6 +13,7 @@
     "express": "~4.13.4",
     "file-system": "^2.2.2",
     "jade": "~1.11.0",
+    "mongoose": "^4.9.5",
     "morgan": "~1.7.0",
     "mysql": "^2.11.1",
     "serve-favicon": "~2.3.0"
