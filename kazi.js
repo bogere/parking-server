@@ -85,6 +85,8 @@ server.post('/tasks_save', function(req,res,next){
                 // connection.query('INSERT INTO todo SET ?', taskDetails, function(err,rows){
                         if (err) throw err;
                         res.json({"Message": "Task added successfully"});
+                        // display the json response with teh response of data affected.
+                        //res.json({"id": "id", "status": "success"});//insert response.
 
                      next()
                });
@@ -103,8 +105,9 @@ server.post('/tasks_save', function(req,res,next){
                      // the [values].. values retrieved from the form.  utiilisng the personId for editing
                      if(err) throw err;
                     //res.json(rows);
-                    res.json(results)
+                     res.json(results)
                   //  res.json({"Message": "update of tasks was successful"});
+                  //res.json({"id": "id", "status": "success"}); //update response to notify the client.
             })
 
         } else if (operation == 'delete') {
@@ -119,6 +122,7 @@ server.post('/tasks_save', function(req,res,next){
                   if(err) throw err;
                   res.json(rows);
                   //res.json({"Message": "Tasks was successfully deleted"});
+                  //res.json({"id": "id", "status": "success"});
              });
 
         } else {
