@@ -18,7 +18,7 @@ server.opts(/.*/, function(req,res,next){
    res.send(200); //response is OK
    return next()
 
-})
+});
 
 
 var pool = mysql.createPool({ //when using pools better vesrion.

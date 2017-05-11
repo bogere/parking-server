@@ -232,8 +232,33 @@ server.post('/reserve/:id', function(req,res,next){
 
 })
 
+//calculating teh parking bill..
+/*server.post('/parkingBill:/id', function(req,res,next){
+    var parkingId = req.params.parkingId,
+
+     //where teh computation problem lies.
+     var sql = "SELECT  StartTime , EndTime FROM parking WHERE id =?" ;
+    connection.query(sql,[parkingId], function(err, results){
+           if(err) throw err;
+           //captures the results data n start making computation.
+           if (results.length>0) { //parking details r around.
+               //results[0].EndTime =
+               var startPark = results[0].StartTime,//better make them global variables to access them.
+                   endPark = results[0].EndTime; //for the computation.
+
+           } else {
+               res.send({"status": "401", "success": "No parking info"});
+           }
+    });
+
+
+})*/
+
+
+
 
 server.listen(3000, function(){
     console.log('PMS is running on port 3000');
     //console.log('%s listening at %s', server.name , server.url)
+
 });

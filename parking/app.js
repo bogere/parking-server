@@ -27,10 +27,11 @@ app.set('port', process.env.port || 3000);
 app.use(logger('dev')); //get logs during development..
 //Parse incoming request bodies in a middleware before your handlers, availabe
 //under the `req.body` property.
+   app.use(bodyParser.urlencoded({extended: true})); //caters for x-www-form-urlencoded .
   app.use(bodyParser.json({limit: '100mb'})); //Returns middleware that only parses `json`.
  //app.use(bodyParser.urlencoded({limit:'100mb', extended: false})); //what about the form data.
 //app.use(bodyParser()); //let see what options it allows.
-  app.use(bodyParser.urlencoded({extended: true})); //caters for x-www-form-urlencoded .
+  
 //app.use(multer()); //middleware to handle file uploads.
 //app.use(express.static(path.join(__dirname , 'public' ))); //serving static files...html n css in public folder.
 //allow CORS... origin stuff.
