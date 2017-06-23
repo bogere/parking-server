@@ -71,6 +71,7 @@ server.post('/login', function(req,res,next){
      //capture the login credentials from the login page
      var username = req.params.username,
            passInput = req.params.password;
+           
 
       pool.getConnection(function(err,connection){
           ////selects user details from the DB... n compare the results.
@@ -78,14 +79,14 @@ server.post('/login', function(req,res,next){
           //var sql = "SELECT * FROM vehicle WHERE vehicleNo = ?";
           var sql = "SELECT * FROM drivers WHERE username = ?";
           connection.query(sql, [username], function(err,results){
-               if err throw err; // error in making db queries.
+               if (err) throw err; // error in making db queries.
                //retrieve teh driver details n compare.
                if (results.length>0) {
                    //if user exists... in the db.
                     bcrypt.compare(passInput, results[0].password, function(err,doesMatch){
                         if (doesMatch) {
                             //res.json()
-                            res.send({"status":200, "sucess": "login successful"})
+                            res.send({"status":200, "success": "login successful"})
                         } else {
                             res.send({"status": 204, "success": "Username n password do not match"})
                         }
@@ -118,21 +119,31 @@ server.get('/parking', function(req,res,next){
 
 
 //reserveing the parking space.
-server.post('/reserve/:id', function(req,res,next){
+//server.post('/reserve/:id', function(req,res,next){
+  server.post('/reserve', function(req,res,next){
   //update the parking status of the _id of parking area clicked on...
   //capture teh id of the parking area... n later teh username of the user...who z booking.
   //var parkingId = req.params.id; //or teh android client should pass the id.. itself./ url... instead
-      var parkingId = req.params.parkingId,
+     /* var parkingId = req.params.parkingId,
            parkingStatus = req.params.parkingStatus,
-          username =  req.params.username;
+            username =  req.params.username; */
+
+            var parkingId = req.params.slot_id,
+              //parkingStatus = req.params.slotStatus,
+              //username =   req.params.username;
+              vehicleNo = req.params.vehicleNumber;
+              
+
 
       pool.getConnection(function(err,connection){
           //var sql = "UPDATE task SET  Title=?,Status=? WHERE id = ? ";//table values
-          var sql = "UPDATE parkingSlot SET slot_status=?,reserveTime=?, slot_occupant WHERE slot_id = ? "; //tabel values
+          var sql = "UPDATE parkingSlot SET slot_status=?,reservedTime=?, slot_occupant=? WHERE slot_id = ? "; //tabel values
           //connection.query(sql, [title, status,parkingId], function(err,results){
-        connection.query(sql, [parkingStatus,new Date(),username, parkingId], function(err,results){//post values from form
-             if(err) throw err;
-             res.send(results);
+        //connection.query(sql, [parkingStatus,new Date(),vehicleNo, parkingId], function(err,results){//post values from form
+          connection.query(sql, [1,new Date(),vehicleNo, parkingId], function(err,results){ //1==>reserved
+             if(err) throw err; //failed to connect database.
+             //res.send(results);
+             res.send({"status":200, "success": "ok"}); 
           })
       })
 
@@ -140,13 +151,14 @@ server.post('/reserve/:id', function(req,res,next){
 });
 
 //calculating teh parking bill..
-server.post('/parkingBill:/id', function(req,res,next){
-    var parkingId = req.params.parkingId,
+//server.post('/parkingBill/:id', function(req,res,next){
+ server.post('/parkingBill', function(req,res,next){
+    var parkingId = req.params.parkingId;
        //mak these values global to small extent with this callback.
-          var startPark, endPark, parkingDuration,parkingBill; //serious memory leaking.
+          var startPark, endPark,reserveTime, parkingDuration,parkingBill; //serious memory leaking.
      //where teh computation problem lies.
      //var sql = "SELECT  StartTime , EndTime FROM parking WHERE id =?" ;
-     var sql = "SELECT startTime AND endTime FROM parkingSlot WHERE slot_id = ?";
+     var sql = "SELECT startTime,reserveTime,  AND endTime FROM parkingSlot WHERE slot_id = ?";
     connection.query(sql,[parkingId], function(err, results){
            if(err) throw err;
            //captures the results data n start making computation.
@@ -155,6 +167,8 @@ server.post('/parkingBill:/id', function(req,res,next){
               // var startPark = results[0].startTime,//better make them global variables to access them.
                    startPark = results[0].startTime;
                    endPark = results[0].endTime; //for the computation.
+                   //catering for teh reservattion fine... check whether they hav.
+                   reservePark = results[0].reserveTime;
 
            } else {
                res.send({"status": "401", "success": "No parking info"});
@@ -167,7 +181,49 @@ server.post('/parkingBill:/id', function(req,res,next){
       parkingBill = (endPark- startPark)* 1500;  //make teh pricing dynamic..
       console.log(parkingBill);
 
+      //cater for late parking... did not honour the reservation.
+       //if (reserveTime > startTime by 10 minutes) {
+         if(reserveTime> startTime){ 
+            //add the reserve fine... 1000
+            parkingBill = parkingBill + 1000;
+       } else {
+           parkingBill = parkingBill + 0.00;
+       }
 
+})
+
+
+//make the payments for teh parking duration.
+server.post('/makePayment', function(req,res,next){
+      console.log('in charge of making payments');
+         var username = req.params.username,
+            parkingBill = req.params.parkingBill;  //it must captured from session... or hidden form
+         //make these vraiables global... to use them in deduction calculation.
+          var Balance;
+      //check  whether driver has some cash in the parkingBill.
+       pool.getConnection(function(req,res,next){
+           //check the payment details.... in thedb... assume this is the mtn db server.
+           var sql = "SELECT * FROM parkingBill WHERE username = ?";
+           connection.query(sql,[username] ,function(err,results){
+                 if (results.length>0) {
+                     //if the user details exist in the mtn db
+                       //capture the values. n store them in variables  to be used for deduction.
+                    Balance =  results[0].currentAmount; //currentAmount z table values... rows
+                 } else {
+                     res.send(401, "You are not registered on MTN mobile money")
+                 }
+           });
+            //then make teh  deducations from their account
+               //maybe just use a simple algorithm...
+               Balance = 15000- parkingBill;
+               if (Balance) { //if operation was successful.
+                    res.send(200, "Thank for making payments")
+               } else {
+                 res.send(200, "Sorry ur broke !!!!");
+               }
+
+       })
+      //tehn send thank you response.
 })
 
 
